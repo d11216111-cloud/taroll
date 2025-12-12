@@ -264,10 +264,13 @@
 
     <script>
         // PRNG Implementation (Mulberry32)
+        // A fast, high-quality pseudo-random number generator
+        // Reference: https://github.com/bryc/code/blob/master/jshash/PRNGs.md
         function createPRNG(seed) {
             let state = hashString(seed);
             
             return function() {
+                // Magic constants are part of the Mulberry32 algorithm for good distribution
                 state = (state + 0x6D2B79F5) | 0;
                 let t = Math.imul(state ^ (state >>> 15), 1 | state);
                 t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
@@ -877,8 +880,10 @@
                 seed = Date.now().toString() + Math.random().toString();
             }
             
-            // Display seed
-            seedDisplay.innerHTML = `<strong>🔑 Seed（可複現種子）：</strong>${seed}`;
+            // Display seed (using textContent to prevent XSS)
+            seedDisplay.innerHTML = '<strong>🔑 Seed（可複現種子）：</strong>';
+            const seedText = document.createTextNode(seed);
+            seedDisplay.appendChild(seedText);
             seedDisplay.classList.remove('hidden');
             
             // Create PRNG
